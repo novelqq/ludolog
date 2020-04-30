@@ -1,16 +1,19 @@
-# Use an official node runtime as a parent image
-FROM node:8
+# pull official base image
+FROM node:13.12.0-alpine
 
-WORKDIR /app/
+# set working directory
+WORKDIR /app
 
-# Install dependencies
-COPY package.json yarn.lock /app/frontludo
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
+# install app dependencies
+COPY package.json ./
+COPY package-lock.json ./
 RUN npm install
 
-# Add rest of the client code
-COPY . /app/
+# add app
+COPY . ./
 
-EXPOSE 3000
-
-CMD npm start
+# start app
+CMD ["npm", "start"]
