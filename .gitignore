@@ -27,7 +27,8 @@ media
 # Python # 
 *.py[cod] 
 *$py.class 
-
+ludoenv
+token.txt
 # Distribution / packaging 
 .Python build/ 
 develop-eggs/ 
@@ -46,7 +47,7 @@ wheels/
 *.egg 
 *.manifest 
 *.spec 
-
+__pycache__
 # Installer logs 
 pip-log.txt 
 pip-delete-this-directory.txt 
@@ -114,3 +115,4 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+.vscode
