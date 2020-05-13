@@ -10,12 +10,18 @@ from rest_framework.views import APIView
 from .serializers import UserSerializer, UserSerializerWithToken
 from .forms import LudoUserCreationForm
 
+def home(request):
+    return render(request, 'home.html')
 
 @api_view(['GET'])
 def current_user(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
+
+@api_view(['GET'])
+def users_games(request):
+    return request.user.collection
 
 class UserList(APIView):
     permission_classes = (permissions.AllowAny,)
