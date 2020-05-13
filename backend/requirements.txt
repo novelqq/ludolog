@@ -9,3 +9,5 @@ pycparser==2.20
 pytz==2020.1
 six==1.14.0
 sqlparse==0.3.1
+django-cors-headers==3.2.1
+djangorestframework-jwt==1.11.0
