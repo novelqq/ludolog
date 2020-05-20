@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Games List{% endblock %}
+
+{% block content %}
+    <ol>
+        {% for game in games %}
+            {% if game.cover %}
+                <li><img src="{{ game.cover.url }}">{{ game.name }}: {{ game.rating }}</img></li>
+            {% else %}
+                <li><img src="{% static 'img/placeholder.png' %}">{{ game.name }}: {{ game.rating }}</img></li>
+            {% endif %}
+            <br>
+        {% endfor %}
+    </ol>
+{% endblock %}
