@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from .views import home
-
+ 
 class HomeTests(TestCase):
     def test_home_view_status_code(self):
         url = reverse('home')

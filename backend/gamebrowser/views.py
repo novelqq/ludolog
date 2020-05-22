@@ -1,10 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from .forms import SignUpForm
+from django.http import Http404
 import requests
 
 def home(request):
     return render(request, 'home.html')
+
+def game(request, pk):
+    game = requests.get('https://api-v3.igdb.com/games/' + str(pk), 
+            params={'fields': 'name, rating, cover.*, summary, rating, aggregated_rating, similar_games.*'}, 
+            headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
+    try:
+        return render(request, 'game.html', {'game' : game[0]})
+    except:
+        raise Http404("Game not found")
 
 def game_list(request):
     games = requests.get('https://api-v3.igdb.com/games', 

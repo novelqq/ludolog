@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ game.name }}{% endblock %}
+{% block content %}
+    <ul style="list-style: none;">
+        <li><img src="{{ game.cover.url }}"></img></li>
+        <li>Title: {{ game.name }}</li>
+        <li>Summary: {{ game.summary }}</li>
+        <li>User Rating: {{ game.rating }}</li>
+        <li>Critic Rating: {{ game.aggregated_rating }}</li>
+        Related Games:
+        {% for related_game in game.similar_games %}
+            <li><a href="{% url 'game' related_game.id %}">{{ related_game.name }}</a></li>
+        {% endfor %}
+    </ul
+{% endblock %}
