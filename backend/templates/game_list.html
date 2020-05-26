@@ -8,10 +8,12 @@
     <ol>
         {% for game in games %}
             {% if game.cover %}
-                <li><img src="{{ game.cover.url }}"></img>{{ game.name }}: {{ game.rating }}</li>
+                <li><img src="{{ game.cover.url }}"></img>
             {% else %}
-                <li><img src="{% static 'img/placeholder.png' %}"></img>{{ game.name }}: {{ game.rating }}</li>
+                <li><img src="{% static 'img/placeholder.png' %}"></img>
             {% endif %}
+            <a href="{% url 'game' game.id %}"> {{ game.name }}</a>: {{ game.rating }}
+            </li>
             <br>
         {% endfor %}
     </ol>

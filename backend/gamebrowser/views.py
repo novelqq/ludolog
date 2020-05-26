@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from .forms import SignUpForm
+from django.contrib.auth.decorators import login_required
+from .forms import LogForm, SignUpForm
 from django.http import Http404
+from django.contrib.auth.models import User
 import requests
 
 def home(request):
@@ -14,7 +16,8 @@ def game(request, pk):
     try:
         return render(request, 'game.html', {'game' : game[0]})
     except:
-        raise Http404("Game not found")
+        # raise Http404("Game not found")
+        return render(request, 'not_found.html')
 
 def game_list(request):
     games = requests.get('https://api-v3.igdb.com/games', 
@@ -36,6 +39,7 @@ def signup(request):
             return redirect('home')
     else:
         form = SignUpForm()
+
     return render(request, 'signup.html', {'form': form})
 
 def login_page(request):
@@ -47,3 +51,23 @@ def login_page(request):
         return redirect('home')
     else:
         return render(request)
+
+@login_required
+def log(request, pk):
+    if request.method == 'POST':
+        form = LogForm(request.POST)
+        if form.is_valid():
+            log = form.save(commit=False)
+            log.user = request.user
+            log.game_id = pk
+            log.save()
+            return redirect('game', pk=pk)
+    else:
+        form = LogForm()
+    return render(request, 'log.html', {'form': form})
+
+
+def collection(request, username):
+    user = User.objects.all().get(username=username)
+    return render(request, 'collection.html', {'user': user})
+
