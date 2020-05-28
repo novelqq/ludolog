@@ -2,12 +2,12 @@
 
 {% load static %}
 
-{% block title %}Games List{% endblock %}
+{% block title %}Search Results{% endblock %}
 
 {% block content %}
-    <form action="{% url 'search_results' %}" method="get">
+    <!-- <form action="{% url 'search_results' %}" method="get">
         <input name="q" type="text" placeholder="Search...">
-    </form>
+    </form> -->
     <ol>
         {% for game in games %}
             {% if game.cover %}

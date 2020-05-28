@@ -5,6 +5,9 @@ from .forms import LogForm, SignUpForm
 from django.http import Http404
 from django.contrib.auth.models import User
 import requests
+from http.client import HTTPConnection
+from django.core.paginator import Paginator
+from django.views.generic import ListView
 
 def home(request):
     return render(request, 'home.html')
@@ -20,15 +23,47 @@ def game(request, pk):
         return render(request, 'not_found.html')
 
 def game_list(request):
-    games = requests.get('https://api-v3.igdb.com/games', 
-            params={'fields': 'name, rating, cover.*', 'search': 'super mario', 'limit': 20},
-            headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
+    # games = requests.get('https://api-v3.igdb.com/games', 
+    #         params={'fields': 'name, rating, cover.*', 'search': 'super mario', 'limit': 20},
+    #         headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
+    # data = 
+    games = requests.post('https://api-v3.igdb.com/games', 
+                    data='fields name, aggregated_rating, cover.*; where aggregated_rating > 0' \
+                    ' & aggregated_rating_count > 10; sort aggregated_rating desc; limit 20;',
+                    headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
     for game in games:
-        if 'rating' not in game:
-            game['rating'] = 0
-    games.sort(key=lambda x: x['rating'], reverse=True)
+        if 'aggregated_rating' not in game:
+            game['aggregated_rating'] = 0
+        game['aggregated_rating'] = round(game['aggregated_rating'], 2)
 
     return render(request, 'game_list.html', {'games': games})
+
+# def search_results(request, query):
+#     # search = request.GET.get('q')
+#     games = requests.post('https://api-v3.igdb.com/games', 
+#                     data='fields name, aggregated_rating, cover.*; search "' + query + '"' \
+#                     'sort aggregated_rating desc; limit 20;',
+#                     headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
+#     return render(request, 'search_results.html', {'games': games})
+
+class SearchResultsView(ListView):
+    template_name = 'search_results.html'
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        print("Query: ", query)
+        games = requests.post('https://api-v3.igdb.com/games', 
+                            data='fields name, aggregated_rating, cover.*; search "' + query + '"; ' \
+                            'limit 20;',
+                            headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
+        print('AAAAAAAAAAA fields name, aggregated_rating, cover.*; search "' + query + '"; ' \
+                            'sort aggregated_rating desc; limit 20;')
+        print(games)
+        return games
+
+    def get(self, request):
+        context = locals()
+        context['games'] = self.get_queryset()
+        return render(self.request, self.template_name, context)
 
 def signup(request):
     if request.method == 'POST':
@@ -70,4 +105,3 @@ def log(request, pk):
 def collection(request, username):
     user = User.objects.all().get(username=username)
     return render(request, 'collection.html', {'user': user})
-
