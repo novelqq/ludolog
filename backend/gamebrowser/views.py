@@ -26,17 +26,24 @@ def game_list(request):
     # games = requests.get('https://api-v3.igdb.com/games', 
     #         params={'fields': 'name, rating, cover.*', 'search': 'super mario', 'limit': 20},
     #         headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
-    # data = 
+    # data =
+    limit = 50
+    page = request.GET.get('page', 1)
     games = requests.post('https://api-v3.igdb.com/games', 
                     data='fields name, aggregated_rating, cover.*; where aggregated_rating > 0' \
-                    ' & aggregated_rating_count > 10; sort aggregated_rating desc; limit 20;',
+                    ' & aggregated_rating_count > 10; sort aggregated_rating desc; limit'+ str(limit)+'; offset '+str(limit*(int(page)-1))+';',
                     headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
     for game in games:
         if 'aggregated_rating' not in game:
             game['aggregated_rating'] = 0
         game['aggregated_rating'] = round(game['aggregated_rating'], 2)
 
-    return render(request, 'game_list.html', {'games': games})
+    print('LENGTH OF GAMES:', len(games))
+    # p = Paginator(games, 2)
+    # games = p.page(page)
+    # print(games.has_next)
+
+    return render(request, 'game_list.html', {'games': games, 'page': int(page)})
 
 # def search_results(request, query):
 #     # search = request.GET.get('q')
@@ -50,10 +57,11 @@ class SearchResultsView(ListView):
     template_name = 'search_results.html'
     def get_queryset(self):
         query = self.request.GET.get('q')
+        self.query = query
         print("Query: ", query)
         games = requests.post('https://api-v3.igdb.com/games', 
                             data='fields name, aggregated_rating, cover.*; search "' + query + '"; ' \
-                            'limit 20;',
+                            'limit 100;',
                             headers={'user-key': '03093c78ab27aa2fb5752d2b7b9167e4'}).json()
         print('AAAAAAAAAAA fields name, aggregated_rating, cover.*; search "' + query + '"; ' \
                             'sort aggregated_rating desc; limit 20;')
@@ -62,7 +70,13 @@ class SearchResultsView(ListView):
 
     def get(self, request):
         context = locals()
-        context['games'] = self.get_queryset()
+        games = self.get_queryset()
+        page = request.GET.get('page', 1)
+        p = Paginator(games, 10)
+        games = p.page(page)
+        print(games.has_next)
+        context['games'] = games
+        context['query'] = self.query
         return render(self.request, self.template_name, context)
 
 def signup(request):

@@ -20,14 +20,14 @@
             <br>
         {% endfor %}
     </ol>
-    {% comment %} <div class="pagination">
-    <span>
-    {% if games.has_next %}
-            <a href="?page={{ games.next_page_number }}">next</a>
-    {% endif %}
-    {% if games.has_previous %}
-        <a href="?page={{ games.next_page_number }}">previous</a>
-    {% endif %}
-    </span>
-    </div> {% endcomment %}
+    <div class="pagination">
+        <span>
+            {% if games.has_next %}
+                <a href="?q={{ query }}&page={{ games.next_page_number }}">next</a>
+            {% endif %}
+            {% if games.has_previous %}
+                <a href="?q={{ query }}&page={{ games.previous_page_number }}">previous</a>
+            {% endif %}
+        </span>
+    </div>
 {% endblock %}
